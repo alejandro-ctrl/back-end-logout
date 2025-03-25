@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const Usuario = require("../models/usuario.js");
 const dotenv = require("dotenv");
 const { UnauthorizedError } = require("../utils/errors");
-const BlacklistToken = require("../models/BlacklistToken"); // Asegúrate de crear este modelo
+
 
 dotenv.config();
 
@@ -122,18 +122,12 @@ const getProfile = async (req, res) => {
 // 🔹 CERRAR SESIÓN (LOGOUT)
 const logout = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      throw new UnauthorizedError("Token no proporcionado");
-    }
-
-    // Guardar el token en la lista negra
-    await BlacklistToken.create({ token });
-
-    res.json({ success: true, message: "Sesión cerrada correctamente" });
+      res.cookie('token', '', { expires: new Date(0) });
+      res.json({ success: true, message: "Sesión cerrada correctamente" });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Error al cerrar sesión", error });
+      res.status(500).json({ success: false, message: "Error al cerrar sesión" });
   }
 };
+
 
 module.exports = { register, login, getProfile, logout };
